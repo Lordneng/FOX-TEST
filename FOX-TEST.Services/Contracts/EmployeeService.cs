@@ -1,8 +1,6 @@
 ﻿using FOX_TEST.Models.Entities;
-using FOX_TEST.Services.Extensions;
 using FOX_TEST.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using StackExchange.Redis;
 
 namespace FOX_TEST.Services.Contracts
 {
@@ -42,14 +40,16 @@ namespace FOX_TEST.Services.Contracts
             var dataEmp = _foxContext.Employees.FirstOrDefault(x => x.Id == id);
             var data = _foxContext.Employees.Include(x => x.Children).Where(x => x.ParentId == id).ToList();
 
-            if (data != null)
+            if(dataEmp != null)
             {
-                dataEmp.Children = _getChildren(data);
-                cacheData = dataEmp;
-                _cacheService.SetData<Employee>("employee:" + id.ToString(), cacheData, expirationTime);
+                if (data != null)
+                {
+                    dataEmp.Children = _getChildren(data);
+                    cacheData = dataEmp;
+                    _cacheService.SetData<Employee>("employee:" + id.ToString(), cacheData, expirationTime);
+                }
             }
-                
-
+                     
             return cacheData;
         }
 
